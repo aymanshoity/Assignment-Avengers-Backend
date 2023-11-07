@@ -43,6 +43,7 @@ async function run() {
     // await client.connect();
 
     const assignmentCollection= client.db("Assignment-Avengers").collection("assignments")
+    const myAssignmentCollection= client.db("Assignment-Avengers").collection("myAssignments")
     // Auth related 
     app.post('/jwt',async(req,res)=>{
         const user=req.body
@@ -110,6 +111,19 @@ async function run() {
         const result=await assignmentCollection.updateOne(filter,updatedAssignment,options)
         res.send(result)
     })
+
+    app.post('/myAssignments',async(req,res)=>{
+        const myListedAssignment=req.body
+        console.log(myListedAssignment)
+        const result=await myAssignmentCollection.insertOne(myListedAssignment)
+        res.send(result)
+
+    })
+    app.get('/myAssignments',async(req,res)=>{
+        const result=await myAssignmentCollection.find().toArray()
+        res.send(result)
+    })
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
