@@ -44,6 +44,7 @@ async function run() {
 
     const assignmentCollection= client.db("Assignment-Avengers").collection("assignments")
     const myAssignmentCollection= client.db("Assignment-Avengers").collection("myAssignments")
+    const submissionCollection= client.db("Assignment-Avengers").collection("submissions")
     // Auth related 
     app.post('/jwt',async(req,res)=>{
         const user=req.body
@@ -119,8 +120,26 @@ async function run() {
         res.send(result)
 
     })
+    
     app.get('/myAssignments',async(req,res)=>{
-        const result=await myAssignmentCollection.find().toArray()
+        console.log(req.query.email)
+        let query={};
+        if(req.query?.email){
+            query={studentEmail:req.query.email}
+        }
+        const result=await myAssignmentCollection.find(query).toArray()
+        res.send(result)
+    })
+
+    app.post('/submissions',async(req,res)=>{
+        const submission=req.body
+        console.log(submission)
+        const result=await submissionCollection.insertOne(submission)
+        res.send(result)
+
+    })
+    app.get('/submissions',async(req,res)=>{
+        const result=await submissionCollection.find().toArray()
         res.send(result)
     })
 
