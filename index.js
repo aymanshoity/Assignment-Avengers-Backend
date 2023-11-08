@@ -37,6 +37,9 @@ const client = new MongoClient(uri, {
   }
 });
 
+// middlewares
+// const verifyToken
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -123,6 +126,7 @@ async function run() {
     
     app.get('/myAssignments',async(req,res)=>{
         console.log(req.query.email)
+        console.log('cook',req.cookies)
         let query={};
         if(req.query?.email){
             query={studentEmail:req.query.email}
@@ -143,6 +147,9 @@ async function run() {
         let query={};
         if(req.query?.status){
             query={status:req.query.status}
+        }
+        if(req.query?.email){
+             query={email:req.query.email}
         }
         const result=await submissionCollection.find(query).toArray()
         res.send(result)
@@ -169,12 +176,13 @@ async function run() {
         const result=await submissionCollection.updateOne(filter,markedAssignment)
         res.send(result)
     })
-    app.get('/submissions/:email;',async(req,res)=>{
-        const email=req.params.email
-        const query={email:email}
-        const result=await submissionCollection.find(query).toArray()
-        res.send(result)
-    })
+    // app.get('/submissions',async(req,res)=>{
+    //     console.log(req.query.email)
+    //     let query={};
+    //     
+    //     const result=await submissionCollection.find(query).toArray()
+    //     res.send(result)
+    // })
 
 
     // Send a ping to confirm a successful connection
