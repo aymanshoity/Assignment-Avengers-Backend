@@ -11,7 +11,7 @@ dotenv.config()
 // middleware
 app.use(express.json())
 app.use(cors({
-    origin:['http://localhost:5174','http://localhost:5173'],
+    origin:['http://localhost:5174','http://localhost:5173','http://localhost:5175'],
     credentials: true
 }))
 app.use(cookieParser())
@@ -139,7 +139,40 @@ async function run() {
 
     })
     app.get('/submissions',async(req,res)=>{
-        const result=await submissionCollection.find().toArray()
+        console.log(req.query.status)
+        let query={};
+        if(req.query?.status){
+            query={status:req.query.status}
+        }
+        const result=await submissionCollection.find(query).toArray()
+        res.send(result)
+    })
+    app.get('/submissions/:id',async(req,res)=>{
+        const id=req.params.id
+        const query={_id:new ObjectId(id)}
+        const result=await submissionCollection.findOne(query)
+        res.send(result)
+    })
+
+    app.patch('/submissions/:id',async(req,res)=>{
+        const id=req.params.id
+        const filter={_id :new ObjectId(id)}
+        const existingAssignment=req.body
+        const markedAssignment={
+            $set:{
+                status:existingAssignment.status,
+                marks:existingAssignment.marks,
+                // feedback:feedback,
+                
+            }
+        }
+        const result=await submissionCollection.updateOne(filter,markedAssignment)
+        res.send(result)
+    })
+    app.get('/submissions/:email;',async(req,res)=>{
+        const email=req.params.email
+        const query={email:email}
+        const result=await submissionCollection.find(query).toArray()
         res.send(result)
     })
 
