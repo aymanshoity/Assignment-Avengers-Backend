@@ -38,7 +38,22 @@ const client = new MongoClient(uri, {
 });
 
 // middlewares
-// const verifyToken
+const verifyToken=(req,res,next)=>{
+    const token=req.cookies?.token
+    // console.log('token in the middleware',token)
+    if(!token){
+        return res.status(401).send({message:'Unauthorized Access'})
+    }
+    jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,decoded)=>{
+        if(err){
+            return res.status(401).send({message:'Unauthorized Access'})
+        }
+        req.user=decoded
+        console.log(req.user)
+        next()
+    })
+    // next()
+}
 
 async function run() {
   try {
@@ -124,12 +139,15 @@ async function run() {
 
     })
     
-    app.get('/myAssignments',async(req,res)=>{
+    app.get('/myAssignments',verifyToken,async(req,res)=>{
         console.log(req.query.email)
-        console.log('cook',req.cookies)
+        console.log('token owner info',req.user)
+        if(req.user.email !==req.query.email){
+            return res.status(403).send({message:'Forbidden Access'})
+        }
         let query={};
         if(req.query?.email){
-            query={studentEmail:req.query.email}
+            query={email:req.query.email}
         }
         const result=await myAssignmentCollection.find(query).toArray()
         res.send(result)
@@ -144,10 +162,15 @@ async function run() {
     })
     app.get('/submissions',async(req,res)=>{
         console.log(req.query.status)
+        
         let query={};
         if(req.query?.status){
             query={status:req.query.status}
         }
+        // console.log('token owner info',req.user)
+        // if(req.user.email !==req.query.email){
+        //     return res.status(403).send({message:'Forbidden Access'})
+        // }
         if(req.query?.email){
              query={email:req.query.email}
         }
