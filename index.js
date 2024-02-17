@@ -12,7 +12,7 @@ const port = process.env.PORT || 5000;
 // middleware
 app.use(express.json())
 app.use(cors({
-    origin: ['https://assignment-avengers.netlify.app',
+    origin: ['https://assignment-avengers.netlify.app','*'
         // 'http://localhost:5174',
         // 'http://localhost:5173',
     ],
